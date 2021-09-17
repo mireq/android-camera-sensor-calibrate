@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<manifest xmlns:a='http://schemas.android.com/apk/res/android' package='sk.linuxos' a:versionCode='0' a:versionName='0'>
+	<uses-sdk a:minSdkVersion="14" />
+	<uses-sdk a:targetSdkVersion="31" />
+	<uses-permission a:name="android.permission.CAMERA" />
+	<uses-permission a:name="android.permission.INTERNET" />
+	<uses-permission a:name="android.permission.FOREGROUND_SERVICE" />
+	<uses-feature a:name="android.hardware.camera.level.full" />
+	<application a:label='Camera calibrate'>
+		<activity a:name='sk.linuxos.CameraCalibrate'>
+			<intent-filter>
+				<category a:name='android.intent.category.LAUNCHER'/>
+				<action a:name='android.intent.action.MAIN'/>
+			</intent-filter>
+		</activity>
+	</application>
+</manifest>
