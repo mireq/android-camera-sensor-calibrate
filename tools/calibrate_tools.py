@@ -492,10 +492,10 @@ def save_raw(args):
 
 
 def write_vignette(args):
-	images = np.load('../output/white.raw')
-	metadata = {'black_level': [16.0, 16.0, 16.0, 16.0], 'white_level': 1023}
-	images = images.astype(np.float64)
-	#images, metadata = camera.get_raw()
+	#images = np.load('../output/white.raw')
+	#metadata = {'black_level': [16.0, 16.0, 16.0, 16.0], 'white_level': 1023}
+	#images = images.astype(np.float64)
+	images, metadata = camera.get_raw()
 
 	for plane_slice, black_level in zip(PLANES, metadata['black_level']):
 		images[0][plane_slice] -= int(black_level)
