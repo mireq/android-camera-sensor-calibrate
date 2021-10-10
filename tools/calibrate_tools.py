@@ -494,8 +494,9 @@ def save_raw(args):
 def write_vignette(args):
 	#images = np.load('../output/white.raw')
 	#metadata = {'black_level': [16.0, 16.0, 16.0, 16.0], 'white_level': 1023}
-	#images = images.astype(np.float64)
+	set_common_camera_args(camera, args)
 	images, metadata = camera.get_raw()
+	images = images.astype(np.float64)
 
 	for plane_slice, black_level in zip(PLANES, metadata['black_level']):
 		images[0][plane_slice] -= int(black_level)
@@ -566,7 +567,7 @@ def main():
 	subparser.add_argument('output_file', type=argparse.FileType(mode='wb'), help="Dark frame file")
 	subparser = add_common_camera_args(subparsers.add_parser('save_raw', help="Save raw"))
 	subparser.add_argument('output_file', type=argparse.FileType(mode='wb'), help="Raw file")
-	subparser = subparsers.add_parser('write_vignette', help="Write vignette map")
+	subparser = add_common_camera_args(subparsers.add_parser('write_vignette', help="Write vignette map"))
 	subparser.add_argument('gamma', type=argparse.FileType(mode='r'), help="Gamma json")
 	subparser.add_argument('output_file', type=argparse.FileType(mode='wb'), help="Raw file")
 	subparser.add_argument('--color', type=str, choices=["R", "G", "B"], help="Color component", default="G")
