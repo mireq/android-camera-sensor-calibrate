@@ -2,6 +2,8 @@
 import argparse
 import json
 from pathlib import Path
+import sys
+import os
 
 import cv2
 import matplotlib as mpl
@@ -52,8 +54,10 @@ def apply_vignette(image, metadata):
 	if not 'vignette_map' in metadata:
 		return image
 	vignette = np.load(metadata['dir'] / metadata['vignette_map'])
-	vignette = cv2.resize(vignette, tuple(reversed(image.shape)), interpolation=cv2.INTER_LANCZOS4)
-	return image * vignette
+	for idx, vignette in enumerate(vignette):
+		vignette = cv2.resize(vignette, tuple(reversed(image.shape)), interpolation=cv2.INTER_LANCZOS4)[PLANES[idx]]
+		image[PLANES[idx]] = image[PLANES[idx]] * vignette
+	return image
 
 
 def normalize_image(image, metadata):
@@ -77,11 +81,15 @@ def denormalize_image(image, metadata):
 
 
 def main():
+	suffix = '_correct.dng'
+
 	parser = argparse.ArgumentParser(description="Fix raw")
 	parser.add_argument('camera_metadata', type=argparse.FileType(mode='r'), help="Camera metadata json")
 	parser.add_argument('input_raw', type=argparse.FileType(mode='rb'), help="Input raw")
-	parser.add_argument('output_raw', type=argparse.FileType(mode='wb'), help="Output raw")
 	args = parser.parse_args()
+	if (args.input_raw.name.endswith(suffix)):
+		sys.stderr.write("Ignoring file with suffix " + suffix)
+		sys.exit(-1)
 
 	camera_metadata = json.load(args.camera_metadata)
 	raw_data = args.input_raw.read()
@@ -96,8 +104,11 @@ def main():
 	image = apply_vignette(image, camera_metadata)
 	image = denormalize_image(image, camera_metadata)
 
-	args.output_raw.write(raw_header)
-	args.output_raw.write(image.tobytes())
+	output_name = os.path.splitext(args.input_raw.name)[0] + suffix
+
+	with open(output_name, 'wb') as output_raw:
+		output_raw.write(raw_header)
+		output_raw.write(image.tobytes())
 
 
 if __name__ == "__main__":
